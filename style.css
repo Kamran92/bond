@@ -1,0 +1,356 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.header {
+  background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+  color: white;
+  padding: 25px;
+  text-align: center;
+}
+
+.header h1 {
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+
+.header p {
+  opacity: 0.9;
+  font-size: 14px;
+}
+
+.calculator {
+  padding: 25px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-row {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.form-column {
+  flex: 1;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.date-info {
+  background: #e8f4fd;
+  border: 1px solid #3498db;
+  border-radius: 6px;
+  padding: 10px;
+  margin-top: 5px;
+  font-size: 12px;
+  color: #2c3e50;
+}
+
+.price-info {
+  background: #e8f6f3;
+  border: 1px solid #27ae60;
+  border-radius: 6px;
+  padding: 10px;
+  margin-top: 5px;
+  font-size: 12px;
+  color: #27ae60;
+  text-align: center;
+  font-weight: 600;
+}
+
+.calculate-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.calculate-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+}
+
+.results {
+  margin-top: 30px;
+  padding: 25px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  border-left: 4px solid #3498db;
+}
+
+.results h2 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+  font-size: 18px;
+}
+
+.result-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.result-card {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.result-card.primary {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: white;
+}
+
+.result-value {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.result-label {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.details {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 15px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  color: #7f8c8d;
+  font-size: 14px;
+}
+
+.detail-value {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.tax-info {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 6px;
+  padding: 12px;
+  margin-top: 15px;
+  font-size: 12px;
+  color: #856404;
+}
+
+.days-display {
+  background: #e8f6f3;
+  border: 1px solid #27ae60;
+  border-radius: 6px;
+  padding: 12px;
+  margin-top: 10px;
+  text-align: center;
+  font-weight: 600;
+  color: #27ae60;
+}
+
+.coupons-display {
+  background: #e8f4fd;
+  border: 1px solid #3498db;
+  border-radius: 6px;
+  padding: 12px;
+  margin-top: 10px;
+  text-align: center;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.price-display {
+  background: #fff3cd;
+  border: 1px solid #f39c12;
+  border-radius: 6px;
+  padding: 12px;
+  margin-top: 10px;
+  text-align: center;
+  font-weight: 600;
+  color: #e67e22;
+}
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+  body {
+    padding: 10px;
+  }
+
+  .container {
+    margin: 0;
+    border-radius: 10px;
+  }
+
+  .header {
+    padding: 20px 15px;
+  }
+
+  .header h1 {
+    font-size: 20px;
+  }
+
+  .calculator {
+    padding: 15px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .result-grid,
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .results {
+    padding: 15px;
+    margin-top: 20px;
+  }
+
+  .result-value {
+    font-size: 20px;
+  }
+
+  .detail-row {
+    flex-direction: column;
+    padding: 10px 0;
+  }
+
+  .detail-label {
+    margin-bottom: 3px;
+  }
+
+  .detail-value {
+    font-size: 15px;
+  }
+
+  .date-info,
+  .price-info,
+  .tax-info {
+    font-size: 11px;
+    padding: 8px;
+  }
+
+  .days-display,
+  .coupons-display {
+    padding: 10px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header h1 {
+    font-size: 18px;
+  }
+
+  .header p {
+    font-size: 13px;
+  }
+
+  .calculator {
+    padding: 12px;
+  }
+
+  input,
+  select {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .calculate-btn {
+    padding: 12px;
+    font-size: 15px;
+  }
+
+  .results h2 {
+    font-size: 16px;
+  }
+
+  .result-card {
+    padding: 12px;
+  }
+
+  .result-value {
+    font-size: 18px;
+  }
+
+  .details {
+    padding: 12px;
+  }
+}
