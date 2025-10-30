@@ -282,18 +282,16 @@
               <input type="number" id="nominal" value="1000" step="1" />
             </div>
             <div class="form-column">
-              <label for="price">Цена покупки (руб за штуку)</label>
-              <input type="number" id="price" value="965" step="0.01" />
-              <div id="pricePercentage" class="price-info">
-                💰 Цена: 96.5% от номинала
-              </div>
+              <label for="coupon">Размер купона (руб)</label>
+              <input type="number" id="coupon" value="21.78" step="0.01" />
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-column">
-              <label for="coupon">Размер купона (руб)</label>
-              <input type="number" id="coupon" value="21.78" step="0.01" />
+              <label for="nextCouponDate">Дата ближайшего купона</label>
+              <input type="date" id="nextCouponDate" value="2025-11-26" />
+              <div class="date-info">Дата следующей купонной выплаты</div>
             </div>
             <div class="form-column">
               <label for="paymentFrequency">Периодичность выплат (дней)</label>
@@ -319,9 +317,11 @@
 
           <div class="form-row">
             <div class="form-column">
-              <label for="nextCouponDate">Дата ближайшего купона</label>
-              <input type="date" id="nextCouponDate" value="2025-11-26" />
-              <div class="date-info">Дата следующей купонной выплаты</div>
+              <label for="price">Цена покупки (руб за штуку)</label>
+              <input type="number" id="price" value="965" step="0.01" />
+              <div id="pricePercentage" class="price-info">
+                💰 Цена: 96.5% от номинала
+              </div>
             </div>
             <div class="form-column">
               <label for="quantity">Количество облигаций</label>
