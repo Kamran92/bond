@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Калькулятор доходности облигаций</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        color: white;
+        padding: 25px;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 24px;
+        margin-bottom: 5px;
+      }
+
+      .header p {
+        opacity: 0.9;
+        font-size: 14px;
+      }
+
+      .calculator {
+        padding: 25px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-row {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 15px;
+      }
+
+      .form-column {
+        flex: 1;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 14px;
+      }
+
+      input,
+      select {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+      }
+
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+      }
+
+      .date-info {
+        background: #e8f4fd;
+        border: 1px solid #3498db;
+        border-radius: 6px;
+        padding: 10px;
+        margin-top: 5px;
+        font-size: 12px;
+        color: #2c3e50;
+      }
+
+      .price-info {
+        background: #e8f6f3;
+        border: 1px solid #27ae60;
+        border-radius: 6px;
+        padding: 10px;
+        margin-top: 5px;
+        font-size: 12px;
+        color: #27ae60;
+        text-align: center;
+        font-weight: 600;
+      }
+
+      .calculate-btn {
+        width: 100%;
+        background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+        color: white;
+        border: none;
+        padding: 15px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 10px;
+      }
+
+      .calculate-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+      }
+
+      .results {
+        margin-top: 30px;
+        padding: 25px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        border-left: 4px solid #3498db;
+      }
+
+      .results h2 {
+        color: #2c3e50;
+        margin-bottom: 20px;
+        font-size: 18px;
+      }
+
+      .result-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+
+      .result-card {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .result-card.primary {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        color: white;
+      }
+
+      .result-value {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 5px;
+      }
+
+      .result-label {
+        font-size: 12px;
+        opacity: 0.8;
+      }
+
+      .details {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 15px;
+      }
+
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #f0f0f0;
+      }
+
+      .detail-row:last-child {
+        border-bottom: none;
+      }
+
+      .detail-label {
+        color: #7f8c8d;
+        font-size: 14px;
+      }
+
+      .detail-value {
+        font-weight: 600;
+        color: #2c3e50;
+      }
+
+      .tax-info {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 6px;
+        padding: 12px;
+        margin-top: 15px;
+        font-size: 12px;
+        color: #856404;
+      }
+
+      .days-display {
+        background: #e8f6f3;
+        border: 1px solid #27ae60;
+        border-radius: 6px;
+        padding: 12px;
+        margin-top: 10px;
+        text-align: center;
+        font-weight: 600;
+        color: #27ae60;
+      }
+
+      .coupons-display {
+        background: #e8f4fd;
+        border: 1px solid #3498db;
+        border-radius: 6px;
+        padding: 12px;
+        margin-top: 10px;
+        text-align: center;
+        font-weight: 600;
+        color: #2c3e50;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .price-display {
+        background: #fff3cd;
+        border: 1px solid #f39c12;
+        border-radius: 6px;
+        padding: 12px;
+        margin-top: 10px;
+        text-align: center;
+        font-weight: 600;
+        color: #e67e22;
+      }
+
+      @media (max-width: 768px) {
+        .form-row {
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .result-grid,
+        .info-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .container {
+          margin: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>💰 Калькулятор доходности облигаций</h1>
+        <p>Расчёт простой доходности к погашения с учётом налогов и комиссий</p>
+      </div>
+
+      <div class="calculator">
+        <div class="form-group">
+          <div class="form-row">
+            <div class="form-column">
+              <label for="nominal">Номинал облигации (руб)</label>
+              <input type="number" id="nominal" value="1000" step="1" />
+            </div>
+            <div class="form-column">
+              <label for="price">Цена покупки (руб за штуку)</label>
+              <input type="number" id="price" value="965" step="0.01" />
+              <div id="pricePercentage" class="price-info">
+                💰 Цена: 96.5% от номинала
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-column">
+              <label for="coupon">Размер купона (руб)</label>
+              <input type="number" id="coupon" value="21.78" step="0.01" />
+            </div>
+            <div class="form-column">
+              <label for="paymentFrequency">Периодичность выплат (дней)</label>
+              <input type="number" id="paymentFrequency" value="30" step="1" />
+              <div class="date-info">
+                Каждые сколько дней выплачиваются купоны
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-column">
+              <label for="purchaseDate">Дата покупки</label>
+              <input type="date" id="purchaseDate" />
+              <div class="date-info">Дата, когда вы покупаете облигацию</div>
+            </div>
+            <div class="form-column">
+              <label for="maturityDate">Дата погашения</label>
+              <input type="date" id="maturityDate" value="2026-01-25" />
+              <div class="date-info">Дата, когда облигация погашается</div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-column">
+              <label for="nextCouponDate">Дата ближайшего купона</label>
+              <input type="date" id="nextCouponDate" value="2025-11-26" />
+              <div class="date-info">Дата следующей купонной выплаты</div>
+            </div>
+            <div class="form-column">
+              <label for="quantity">Количество облигаций</label>
+              <input type="number" id="quantity" value="50" step="1" />
+            </div>
+          </div>
+
+          <div class="info-grid">
+            <div id="daysDisplay" class="days-display" style="display: none">
+              📅 Дней до погашения: <span id="daysCount">0</span>
+            </div>
+            <div
+              id="couponsDisplay"
+              class="coupons-display"
+              style="display: none"
+            >
+              🎫 Купонов до погашения: <span id="couponsCount">0</span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-column">
+              <label for="nkd">НКД (общая сумма)</label>
+              <input type="number" id="nkd" value="145" step="0.01" />
+            </div>
+            <div class="form-column">
+              <label for="commission">Комиссия брокера</label>
+              <input type="number" id="commission" value="148.85" step="0.01" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-column">
+              <label for="taxRate">Ставка налога (%)</label>
+              <select id="taxRate">
+                <option value="0.13">13% (стандартная)</option>
+                <option value="0.15">15% (свыше 5 млн доходов)</option>
+                <option value="0.00">0% (ИИС тип Б)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <button class="calculate-btn" onclick="calculateYTM()">
+          📊 Рассчитать доходность
+        </button>
+
+        <div class="results" id="results" style="display: none">
+          <h2>📈 Результаты расчёта</h2>
+
+          <div class="result-grid">
+            <div class="result-card primary">
+              <div class="result-value" id="periodYield">0.00%</div>
+              <div class="result-label">Доходность за период</div>
+            </div>
+            <div class="result-card">
+              <div class="result-value" id="annualYield">0.00%</div>
+              <div class="result-label">Годовая доходность</div>
+            </div>
+          </div>
+
+          <div class="details">
+            <div class="detail-row">
+              <span class="detail-label">Срок до погашения:</span>
+              <span class="detail-value" id="daysResult">0 дней</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Купонов до погашения:</span>
+              <span class="detail-value" id="couponsResult">0</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Цена покупки:</span>
+              <span class="detail-value" id="priceResult">0 руб (0%)</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Общие вложения:</span>
+              <span class="detail-value" id="totalInvestment">0 руб</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Доход от купонов:</span>
+              <span class="detail-value" id="couponIncome">0 руб</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Прибыль от погашения:</span>
+              <span class="detail-value" id="capitalGain">0 руб</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Налог на купоны:</span>
+              <span class="detail-value" id="couponTax">0 руб</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Налог на прибыль:</span>
+              <span class="detail-value" id="capitalGainTax">0 руб</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Чистая прибыль за период:</span>
+              <span class="detail-value" id="netProfit">0 руб</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Итоговая сумма:</span>
+              <span class="detail-value" id="totalReturn">0 руб</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Всего налогов:</span>
+              <span class="detail-value" id="totalTax">0 руб</span>
+            </div>
+          </div>
+
+          <div class="tax-info">
+            💡 Налог с купонов удерживается при каждой выплате, налог с прибыли
+            - при погашении
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function calculateDaysBetweenDates(startDate, endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const difference = end.getTime() - start.getTime();
+        return Math.ceil(difference / (1000 * 3600 * 24));
+      }
+
+      function calculateCouponsCount(
+        purchaseDate,
+        maturityDate,
+        nextCouponDate,
+        paymentFrequency
+      ) {
+        const purchase = new Date(purchaseDate);
+        const maturity = new Date(maturityDate);
+        const nextCoupon = new Date(nextCouponDate);
+
+        // Проверяем, что даты корректны
+        if (purchase >= maturity) return 0;
+        if (nextCoupon <= purchase) return 0;
+
+        let couponsCount = 0;
+        let currentCouponDate = new Date(nextCoupon);
+
+        // Считаем купоны от ближайшей даты до погашения
+        while (currentCouponDate <= maturity) {
+          couponsCount++;
+          currentCouponDate = new Date(currentCouponDate);
+          currentCouponDate.setDate(
+            currentCouponDate.getDate() + parseInt(paymentFrequency)
+          );
+        }
+
+        return couponsCount;
+      }
+
+      function updatePricePercentage() {
+        const nominal = parseFloat(document.getElementById("nominal").value);
+        const price = parseFloat(document.getElementById("price").value);
+
+        if (nominal > 0 && price > 0) {
+          const percentage = (price / nominal) * 100;
+          document.getElementById(
+            "pricePercentage"
+          ).textContent = `💰 Цена: ${percentage.toFixed(2)}% от номинала`;
+          document.getElementById("pricePercentage").style.display = "block";
+        } else {
+          document.getElementById("pricePercentage").style.display = "none";
+        }
+      }
+
+      function updateCalculations() {
+        const purchaseDate = document.getElementById("purchaseDate").value;
+        const maturityDate = document.getElementById("maturityDate").value;
+        const nextCouponDate = document.getElementById("nextCouponDate").value;
+        const paymentFrequency =
+          document.getElementById("paymentFrequency").value;
+
+        updatePricePercentage();
+
+        if (
+          purchaseDate &&
+          maturityDate &&
+          nextCouponDate &&
+          paymentFrequency
+        ) {
+          // Рассчитываем дни до погашения
+          const days = calculateDaysBetweenDates(purchaseDate, maturityDate);
+          document.getElementById("daysCount").textContent = days;
+          document.getElementById("daysDisplay").style.display = "block";
+
+          // Рассчитываем количество купонов
+          const couponsCount = calculateCouponsCount(
+            purchaseDate,
+            maturityDate,
+            nextCouponDate,
+            paymentFrequency
+          );
+          document.getElementById("couponsCount").textContent = couponsCount;
+          document.getElementById("couponsDisplay").style.display = "block";
+
+          // Цветовая индикация
+          const daysDisplay = document.getElementById("daysDisplay");
+          const couponsDisplay = document.getElementById("couponsDisplay");
+
+          if (days < 0) {
+            daysDisplay.style.background = "#fdeaea";
+            daysDisplay.style.borderColor = "#e74c3c";
+            daysDisplay.style.color = "#c0392b";
+          } else {
+            daysDisplay.style.background = "#e8f6f3";
+            daysDisplay.style.borderColor = "#27ae60";
+            daysDisplay.style.color = "#27ae60";
+          }
+
+          if (couponsCount <= 0) {
+            couponsDisplay.style.background = "#fdeaea";
+            couponsDisplay.style.borderColor = "#e74c3c";
+            couponsDisplay.style.color = "#c0392b";
+          } else {
+            couponsDisplay.style.background = "#e8f4fd";
+            couponsDisplay.style.borderColor = "#3498db";
+            couponsDisplay.style.color = "#2c3e50";
+          }
+        }
+      }
+
+      function calculateYTM() {
+        // Получаем значения из формы
+        const nominal = parseFloat(document.getElementById("nominal").value);
+        const price = parseFloat(document.getElementById("price").value);
+        const coupon = parseFloat(document.getElementById("coupon").value);
+        const purchaseDate = document.getElementById("purchaseDate").value;
+        const maturityDate = document.getElementById("maturityDate").value;
+        const nextCouponDate = document.getElementById("nextCouponDate").value;
+        const paymentFrequency = parseInt(
+          document.getElementById("paymentFrequency").value
+        );
+        const quantity = parseInt(document.getElementById("quantity").value);
+        const nkd = parseFloat(document.getElementById("nkd").value);
+        const commission = parseFloat(
+          document.getElementById("commission").value
+        );
+        const taxRate = parseFloat(document.getElementById("taxRate").value);
+
+        // Рассчитываем проценты от номинала
+        const pricePercentage = (price / nominal) * 100;
+
+        // Рассчитываем дни до погашения и количество купонов
+        const days = calculateDaysBetweenDates(purchaseDate, maturityDate);
+        const couponsCount = calculateCouponsCount(
+          purchaseDate,
+          maturityDate,
+          nextCouponDate,
+          paymentFrequency
+        );
+
+        if (days <= 0) {
+          alert("Ошибка: Дата погашения должна быть позже даты покупки");
+          return;
+        }
+
+        if (couponsCount <= 0) {
+          alert(
+            "Ошибка: Не удалось рассчитать количество купонов. Проверьте даты."
+          );
+          return;
+        }
+
+        // Выполняем расчёт
+        const result = calculatePeriodYieldWithTax(
+          nominal,
+          pricePercentage,
+          coupon,
+          couponsCount,
+          days,
+          quantity,
+          nkd,
+          commission,
+          taxRate
+        );
+
+        // Показываем результаты
+        document.getElementById("results").style.display = "block";
+
+        // Обновляем значения
+        document.getElementById("periodYield").textContent =
+          result.periodYield.toFixed(2) + "%";
+        document.getElementById("annualYield").textContent =
+          result.annualYield.toFixed(2) + "%";
+        document.getElementById("daysResult").textContent = days + " дней";
+        document.getElementById("couponsResult").textContent = couponsCount;
+        document.getElementById(
+          "priceResult"
+        ).textContent = `${price} руб (${pricePercentage.toFixed(2)}%)`;
+        document.getElementById("netProfit").textContent =
+          result.periodProfit.toFixed(2) + " руб";
+        document.getElementById("totalInvestment").textContent =
+          result.investment.total.toFixed(2) + " руб";
+        document.getElementById("totalReturn").textContent =
+          (result.investment.total + result.periodProfit).toFixed(2) + " руб";
+        document.getElementById("totalTax").textContent =
+          result.taxes.total.toFixed(2) + " руб";
+        document.getElementById("couponIncome").textContent =
+          result.income.coupons.toFixed(2) + " руб";
+        document.getElementById("capitalGain").textContent =
+          result.income.capitalGain.toFixed(2) + " руб";
+        document.getElementById("couponTax").textContent =
+          result.taxes.couponTax.toFixed(2) + " руб";
+        document.getElementById("capitalGainTax").textContent =
+          result.taxes.capitalGainTax.toFixed(2) + " руб";
+
+        // Прокручиваем к результатам
+        document
+          .getElementById("results")
+          .scrollIntoView({ behavior: "smooth" });
+      }
+
+      function calculatePeriodYieldWithTax(
+        nominal,
+        currentPricePercent,
+        couponValue,
+        couponsCount,
+        daysToMaturity,
+        quantity = 1,
+        nkdTotal = 0,
+        commission = 0,
+        taxRate = 0.13
+      ) {
+        // --- 1. РАСЧЕТ СУММЫ ИНВЕСТИЦИЙ (что мы платим сейчас) ---
+        const pricePerBond = (currentPricePercent / 100) * nominal;
+        const priceAbsolute = pricePerBond * quantity;
+        // При покупке мы платим: Цена + НКД + Комиссия
+        const totalInvestment = priceAbsolute + nkdTotal + commission;
+
+        // --- 2. РАСЧЕТ ДОХОДОВ (что мы получаем за весь период) ---
+        // Доход от всех купонов (исключая тот, который уже в НКД)
+        const totalCouponsIncome = couponValue * couponsCount * quantity;
+
+        // Доход от погашения (номинал - цена покупки)
+        const capitalGainIncome = (nominal - pricePerBond) * quantity;
+
+        // --- 3. РАСЧЕТ РАСХОДОВ (налоги) ---
+        // Налог на купоны: со ВСЕХ полученных купонов
+        const couponTax = totalCouponsIncome * taxRate;
+
+        // Налог на прибыль при погашении: (Номинал - Цена Покупки - Комиссия)
+        // Комиссия УМЕНЬШАЕТ налоговую базу, так как это наш расход.
+        const capitalGainTaxableBase = Math.max(0, capitalGainIncome);
+        const capitalGainTax = capitalGainTaxableBase * taxRate;
+
+        const totalTax = couponTax + capitalGainTax;
+
+        // --- 4. РАСЧЕТ ЧИСТОГО ДЕНЕЖНОГО ПОТОКА ---
+        // Чистая прибыль = (Все доходы) - (Все расходы, включая налоги) - (Начальные инвестиции)
+
+        // Всего мы получим на руки:
+        // - При погашении: Номинал * Количество
+        // - Все купоны: totalCouponsIncome
+        // Итого приток: (nominal * quantity) + totalCouponsIncome
+        const totalCashInflow = nominal * quantity + totalCouponsIncome;
+
+        // Всего мы заплатим:
+        // - При покупке: totalInvestment (цена + нкд + комиссия)
+        // - Налоги: totalTax
+        const totalCashOutflow = totalInvestment + totalTax;
+
+        // Чистая прибыль за период
+        const netProfit = totalCashInflow - totalCashOutflow;
+
+        // --- 5. РАСЧЕТ ДОХОДНОСТИ ---
+        // Доходность за период = (Чистая прибыль / Начальные инвестиции) * 100%
+        const periodYield = (netProfit / totalInvestment) * 100;
+
+        // Приведение к годовой доходности (простая капитализация)
+        const annualYield = periodYield * (365 / daysToMaturity);
+
+        return {
+          periodYield: periodYield,
+          periodProfit: netProfit, // Это ключевое исправление - используем netProfit из денежного потока
+          annualYield: annualYield,
+          investment: {
+            total: totalInvestment,
+            priceAbsolute: priceAbsolute,
+            nkd: nkdTotal,
+            commission: commission,
+          },
+          income: {
+            coupons: totalCouponsIncome,
+            capitalGain: capitalGainIncome,
+            totalCashInflow: totalCashInflow, // Добавим для ясности
+          },
+          taxes: {
+            total: totalTax,
+            couponTax: couponTax,
+            capitalGainTax: capitalGainTax,
+          },
+          cashFlow: {
+            inflow: totalCashInflow,
+            outflow: totalCashOutflow,
+          },
+        };
+      }
+
+      // Обработчики событий для автоматического обновления
+      document
+        .getElementById("nominal")
+        .addEventListener("input", updatePricePercentage);
+      document
+        .getElementById("price")
+        .addEventListener("input", updatePricePercentage);
+      document
+        .getElementById("purchaseDate")
+        .addEventListener("change", updateCalculations);
+      document
+        .getElementById("maturityDate")
+        .addEventListener("change", updateCalculations);
+      document
+        .getElementById("nextCouponDate")
+        .addEventListener("change", updateCalculations);
+      document
+        .getElementById("paymentFrequency")
+        .addEventListener("change", updateCalculations);
+
+      // Автоматический расчёт при загрузке
+      window.onload = function () {
+        // Устанавливаем сегодняшнюю дату как дату покупки по умолчанию
+        const today = new Date().toISOString().split("T")[0];
+        document.getElementById("purchaseDate").value = today;
+
+        updateCalculations();
+        setTimeout(calculateYTM, 500);
+      };
+    </script>
+  </body>
+</html>
