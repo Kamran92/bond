@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Калькулятор доходности облигаций</title>
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="moexApi.css" />
   </head>
   <body>
     <div class="container">
@@ -14,99 +15,132 @@
       </div>
 
       <div class="calculator">
-        <div class="form-group">
+        <div class="search-section">
           <div class="form-row">
             <div class="form-column">
-              <label for="nominal">Номинал облигации (руб)</label>
-              <input type="number" id="nominal" value="1000" step="1" />
-            </div>
-            <div class="form-column">
-              <label for="coupon">Размер купона (руб)</label>
-              <input type="number" id="coupon" value="21.78" step="0.01" />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-column">
-              <label for="paymentFrequency">Периодичность выплат (дней)</label>
-              <input type="number" id="paymentFrequency" value="30" step="1" />
-              <div class="date-info">
-                Каждые сколько дней выплачиваются купоны
+              <label for="isinSearch">Поиск облигации по SECID</label>
+              <div class="search-container">
+                <input
+                  type="text"
+                  id="isinSearch"
+                  placeholder="Введите SECID код (например, SU26233RMFS5)"
+                />
+                <button class="search-btn" onclick="searchByISIN()">
+                  🔍 Найти
+                </button>
+              </div>
+              <div class="search-info">
+                💡 Введите SECID код облигации для автоматического заполнения
+                данных
               </div>
             </div>
-            <div class="form-column">
-              <label for="nextCouponDate">Дата ближайшего купона</label>
-              <input type="date" id="nextCouponDate" value="2025-11-26" />
-              <div class="date-info">Дата следующей купонной выплаты</div>
-            </div>
           </div>
-
-          <div class="form-row">
-            <div class="form-column">
-              <label for="purchaseDate">Дата покупки</label>
-              <input type="date" id="purchaseDate" />
-              <div class="date-info">Дата, когда вы покупаете облигацию</div>
-            </div>
-            <div class="form-column">
-              <label for="maturityDate">Дата погашения</label>
-              <input type="date" id="maturityDate" value="2026-01-25" />
-              <div class="date-info">Дата, когда облигация погашается</div>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-column">
-              <label for="price">Цена покупки (руб за штуку)</label>
-              <input type="number" id="price" value="965" step="0.01" />
-              <div id="pricePercentage" class="price-info">
-                💰 Цена: 96.5% от номинала
-              </div>
-            </div>
-            <div class="form-column">
-              <label for="quantity">Количество облигаций</label>
-              <input type="number" id="quantity" value="50" step="1" />
-            </div>
-          </div>
-
-          <div class="info-grid">
-            <div id="daysDisplay" class="days-display" style="display: none">
-              📅 Дней до погашения: <span id="daysCount">0</span>
-            </div>
-            <div
-              id="couponsDisplay"
-              class="coupons-display"
-              style="display: none"
-            >
-              🎫 Купонов до погашения: <span id="couponsCount">0</span>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-column">
-              <label for="nkd">НКД (общая сумма)</label>
-              <input type="number" id="nkd" value="145" step="0.01" />
-            </div>
-            <div class="form-column">
-              <label for="commission">Комиссия брокера</label>
-              <input type="number" id="commission" value="148.85" step="0.01" />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-column">
-              <label for="taxRate">Ставка налога (%)</label>
-              <select id="taxRate">
-                <option value="0.13">13% (стандартная)</option>
-                <option value="0.15">15% (свыше 5 млн доходов)</option>
-                <option value="0.00">0% (ИИС тип Б)</option>
-              </select>
-            </div>
-          </div>
+          <div
+            id="searchStatus"
+            class="search-status"
+            style="display: none"
+          ></div>
         </div>
 
-        <button class="calculate-btn" onclick="calculateYTM()">
-          📊 Рассчитать доходность
-        </button>
+        <form id="bondForm" onsubmit="calculate(); return false;">
+          <div class="form-group">
+            <div class="form-row">
+              <div class="form-column">
+                <label for="nominal">Номинал облигации (руб)</label>
+                <input type="number" id="nominal" value="" step="1" required />
+              </div>
+              <div class="form-column">
+                <label for="coupon">Размер купона (руб)</label>
+                <input
+                  type="number"
+                  id="coupon"
+                  value=""
+                  step="0.01"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-column">
+                <label for="nextCouponDate"
+                  >Количество купонов к выплате осталось</label
+                >
+                <input type="number" id="couponCount" value="" required />
+              </div>
+              <div class="form-column">
+                <label for="nkd">НКД (на одну облигацию)</label>
+                <input type="number" id="nkd" value="" step="0.01" required />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-column">
+                <label for="purchaseDate">Дата покупки облигации</label>
+                <input type="date" id="purchaseDate" required />
+              </div>
+              <div class="form-column">
+                <label for="maturityDate">Дата погашения облигации</label>
+                <input type="date" id="maturityDate" value="" required />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-column">
+                <label for="price">Цена покупки (руб за штуку)</label>
+                <input type="number" id="price" value="" step="0.01" required />
+              </div>
+              <div class="form-column">
+                <label for="quantity">Количество облигаций</label>
+                <input
+                  type="number"
+                  id="quantity"
+                  value="1"
+                  step="1"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="info-grid">
+              <div id="daysDisplay" class="days-display" style="display: none">
+                📅 Дней до погашения: <span id="daysCount">0</span>
+              </div>
+              <div
+                id="couponsDisplay"
+                class="coupons-display"
+                style="display: none"
+              >
+                🎫 Купонов до погашения: <span id="couponsCount">0</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-column">
+                <label for="taxRate">Ставка налога (%)</label>
+                <select id="taxRate" required>
+                  <option value="0.13">13% (стандартная)</option>
+                  <option value="0.15">15% (свыше 5 млн доходов)</option>
+                  <option value="0.00">0% (ИИС тип Б)</option>
+                </select>
+              </div>
+              <div class="form-column">
+                <label for="commission">Комиссия брокера (%)</label>
+                <input
+                  type="number"
+                  id="commission"
+                  value="0.5"
+                  step="0.01"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="calculate-btn">
+            📊 Рассчитать доходность
+          </button>
+        </form>
 
         <div class="results" id="results" style="display: none">
           <h2>📈 Результаты расчёта</h2>
@@ -124,48 +158,12 @@
 
           <div class="details">
             <div class="detail-row">
-              <span class="detail-label">Срок до погашения:</span>
-              <span class="detail-value" id="daysResult">0 дней</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Купонов до погашения:</span>
-              <span class="detail-value" id="couponsResult">0</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Цена покупки:</span>
-              <span class="detail-value" id="priceResult">0 руб (0%)</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Общие вложения:</span>
-              <span class="detail-value" id="totalInvestment">0 руб</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Доход от купонов:</span>
-              <span class="detail-value" id="couponIncome">0 руб</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Прибыль от погашения:</span>
-              <span class="detail-value" id="capitalGain">0 руб</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Налог на купоны:</span>
-              <span class="detail-value" id="couponTax">0 руб</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Налог на прибыль:</span>
-              <span class="detail-value" id="capitalGainTax">0 руб</span>
+              <span class="detail-label">Осталось дней:</span>
+              <span class="detail-value" id="days">0</span>
             </div>
             <div class="detail-row">
               <span class="detail-label">Чистая прибыль за период:</span>
               <span class="detail-value" id="netProfit">0 руб</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Итоговая сумма:</span>
-              <span class="detail-value" id="totalReturn">0 руб</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Всего налогов:</span>
-              <span class="detail-value" id="totalTax">0 руб</span>
             </div>
           </div>
 
@@ -177,5 +175,6 @@
       </div>
     </div>
     <script src="script.js"></script>
+    <script src="moexApi.js"></script>
   </body>
 </html>
