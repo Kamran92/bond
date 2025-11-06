@@ -4,7 +4,6 @@ async function searchByISIN() {
     .getElementById("isinSearch")
     .value.trim()
     .toUpperCase();
-  const statusElement = document.getElementById("searchStatus");
 
   if (!SECID) {
     showStatus("⚠️ Введите SECID код облигации", "error");
@@ -46,6 +45,7 @@ async function searchByISIN() {
       };
 
       // Получаем данные
+      const bondName = getValue("SECNAME");
       const nominal = getValue("FACEVALUE");
       const couponValue = getValue("COUPONVALUE");
       const nextCoupon = getValue("NEXTCOUPON");
@@ -57,6 +57,7 @@ async function searchByISIN() {
       const remainingCoupons = await getRemainingCoupons(SECID, board);
 
       console.log("✅ Данные облигации получены:");
+      console.log("🏷️ Название облигации:", bondName);
       console.log("🎫 Оставшихся купонных выплат:", remainingCoupons);
       console.log("💰 Номинал:", nominal + " ₽");
       console.log("💵 Размер купона:", couponValue + " ₽");
@@ -67,6 +68,7 @@ async function searchByISIN() {
       console.log("📊 Цена предыдущего закрытия:", prevPrice + " %");
 
       // Заполняем форму данными
+      if (bondName) document.getElementById("bondName").textContent = bondName;
       if (nominal) document.getElementById("nominal").value = nominal;
       if (couponValue) document.getElementById("coupon").value = couponValue;
       // if (couponPeriod)

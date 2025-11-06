@@ -72,8 +72,35 @@
   .search-container {
     flex-direction: column;
   }
-  
+
   .search-btn {
     width: 100%;
+  }
+}
+
+.bond-name {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background-color: #e8f5e8;
+  border: 1px solid #4caf50;
+  border-radius: 6px;
+  font-weight: 600;
+  color: #2e7d32;
+  font-size: 14px;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.bond-name span {
+  font-weight: normal;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
