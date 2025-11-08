@@ -92,12 +92,9 @@ async function searchByISIN() {
         // updatePricePercentage();
       }
 
-      if (accruedInt) {
+      if (accruedInt >= 0) {
         document.getElementById("nkd").value = accruedInt;
       }
-
-      // Обновляем отображение дней и купонов
-      updateDaysAndCoupons();
 
       showStatus("✅ Данные облигации загружены!", "success");
 
@@ -143,13 +140,6 @@ function getTodayDate() {
 //     "pricePercentage"
 //   ).textContent = `💰 Цена: ${percentage.toFixed(1)}% от номинала`;
 // }
-
-function updateDaysAndCoupons() {
-  // Вызываем функцию расчета дней и купонов (должна быть в script.js)
-  if (typeof calculateDaysAndCoupons === "function") {
-    calculateDaysAndCoupons();
-  }
-}
 
 async function getRemainingCoupons(secid) {
   try {
