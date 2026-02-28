@@ -108,9 +108,11 @@ const start = async () => {
       .toSorted((a, b) => a.days - b.days)
       .map((item) => ({
         secId: item.SECID,
+        "% день": Number(item.dailyProfitPercent.toFixed(2)),
         "% годовых": Number(item.annualProfitPercent.toFixed(2)),
         "% за период": Number(item.calculationOfNetProfitPercent.toFixed(2)),
         "осталось дней": item.days,
+        "осталось купонов": item.coupons.length,
         "Период купона": item.couponPeriod,
         осталось: convertDaysSimple(item.days),
         "Вид облигации": item.bondType,
