@@ -75,6 +75,7 @@ const start = async () => {
         coupons,
         nkd,
         bondType,
+        price,
         ...calculate1({
           SECID,
           nominal,
@@ -113,6 +114,7 @@ const start = async () => {
         "Период купона": item.couponPeriod,
         осталось: convertDaysSimple(item.days),
         "Вид облигации": item.bondType,
+        "цена %": item.price,
         Название: item.bondName,
       })),
   );
