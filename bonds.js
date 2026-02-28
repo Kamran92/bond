@@ -16,7 +16,7 @@ const start = async () => {
     ],
     currencyid: "rub",
     faceunit: "rub",
-    bond_type: 9, // Фикс с известным купоном
+    bond_type: 9, // 9 Фикс с известным купоном, 3 флоатеры
   };
 
   const queryString = new URLSearchParams(params).toString();
