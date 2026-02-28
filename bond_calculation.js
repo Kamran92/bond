@@ -1,19 +1,56 @@
 // Основная функция расчета доходности
-function calculate() {
-  const nominal = Number(document.getElementById("nominal").value);
-  const coupon = Number(document.getElementById("coupon").value);
-  const couponCount = Number(document.getElementById("couponCount").value);
-  const price = Number(document.getElementById("price").value);
-  const quantity = Number(document.getElementById("quantity").value);
-  const nkd = Number(document.getElementById("nkd").value);
-  const brokerCommission = Number(document.getElementById("commission").value);
-  const taxRate = Number(document.getElementById("taxRate").value);
-  const purchaseDate = document.getElementById("purchaseDate").value;
-  const maturityDate = document.getElementById("maturityDate").value;
-  // console.log({nominal, coupon, couponCount, price, quantity, nkd, brokerCommission, taxRate, purchaseDate, maturityDate})
+function calculate1({
+  nominal,
+  coupons,
+  price,
+  quantity,
+  nkd,
+  brokerCommission,
+  taxRate,
+  purchaseDate,
+  maturityDate,
+  SECID,
+}) {
+  if (
+    nominal === undefined ||
+    coupons === undefined ||
+    price === undefined ||
+    quantity === undefined ||
+    nkd === undefined ||
+    brokerCommission === undefined ||
+    taxRate === undefined ||
+    purchaseDate === undefined ||
+    maturityDate === undefined
+  ) {
+    console.table({
+      nominal,
+      coupons,
+      price,
+      quantity,
+      nkd,
+      brokerCommission,
+      taxRate,
+      purchaseDate,
+      maturityDate,
+    });
+    return;
+  }
 
   // Расчет суммы всех купонов
-  const couponTotal = coupon * couponCount;
+  const couponTotal = coupons.reduce((acc, item) => (acc += item), 0);
+  // if (SECID === "SU26226RMFS9") {
+  //   console.log({
+  //     nominal,
+  //     coupons,
+  //     price,
+  //     quantity,
+  //     nkd,
+  //     brokerCommission,
+  //     taxRate,
+  //     purchaseDate,
+  //     maturityDate,
+  //   });
+  // }
 
   // Расчет комиссии брокера от суммы сделки
   const commissionAmount = (price + nkd) * (brokerCommission / 100);
@@ -41,12 +78,12 @@ function calculate() {
 
   // Расчет ЧИСТОЙ прибыли в рублях
   const totalCalculationNetProfitRub = calculationNetProfitRub * quantity;
-  console.log(totalCalculationNetProfitRub, "rub");
+  // console.log(totalCalculationNetProfitRub, "rub");
 
   // Расчет ЧИСТОЙ прибыли в процентах
   const calculationOfNetProfitPercent =
     ((calculationNetProfitRub * quantity) / (totalExpenses * quantity)) * 100;
-  console.log(calculationOfNetProfitPercent, "%");
+  // console.log(calculationOfNetProfitPercent, "%");
 
   // Расчет годовой процентной прибыли
   const purchase = new Date(purchaseDate);
@@ -55,29 +92,15 @@ function calculate() {
   const yearsBetween = daysBetween / 365; // период в годах
 
   const annualProfitPercent = calculationOfNetProfitPercent / yearsBetween;
-  console.log(annualProfitPercent, "% годовых");
+  // console.log(annualProfitPercent, "% годовых");
 
-  displayResults({
+  // Расчет дневной процентной прибыли
+  const dailyProfitPercent = calculationOfNetProfitPercent / daysBetween;
+
+  return {
     totalCalculationNetProfitRub,
     calculationOfNetProfitPercent,
     annualProfitPercent,
-    daysBetween,
-  });
-}
-
-// Функция отображения результатов
-function displayResults(results) {
-  // Основные показатели доходности
-  document.getElementById("periodYield").textContent =
-    results.calculationOfNetProfitPercent.toFixed(2) + "%";
-  document.getElementById("annualYield").textContent =
-    results.annualProfitPercent.toFixed(2) + "%";
-
-  // Детальная информация
-  document.getElementById("netProfit").textContent =
-    results.totalCalculationNetProfitRub.toFixed(2) + " руб";
-  document.getElementById("days").textContent = results.daysBetween;
-
-  // Показываем блок с результатами
-  document.getElementById("results").style.display = "block";
+    dailyProfitPercent, // Добавлено: доходность за один день в процентах
+  };
 }

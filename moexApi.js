@@ -13,6 +13,8 @@ async function searchByISIN() {
   console.log("🔍 Поиск облигации:", SECID);
   showStatus("🔍 Поиск облигации...", "loading");
 
+  fillBondForm({});
+
   const boards = [
     "TQOB", // Основной режим - здесь большинство рублевых облигаций
     "TQCB", // С центральным контрагентом - тоже очень популярно
@@ -25,7 +27,6 @@ async function searchByISIN() {
   ];
   for (const board of boards) {
     try {
-      // Прямой запрос к endpointу с основной информацией
       const url = `https://iss.moex.com/iss/engines/stock/markets/bonds/boards/${board}/securities/${SECID}.json`;
       const response = await fetch(url);
       const data = await response.json();
@@ -67,34 +68,17 @@ async function searchByISIN() {
       console.log("📆 Период купона:", couponPeriod + " дней");
       console.log("📊 Цена предыдущего закрытия:", prevPrice + " %");
 
-      // Заполняем форму данными
-      if (bondName) document.getElementById("bondName").textContent = bondName;
-      if (nominal) document.getElementById("nominal").value = nominal;
-      if (couponValue) document.getElementById("coupon").value = couponValue;
-      // if (couponPeriod)
-      //   document.getElementById("paymentFrequency").value = couponPeriod;
-      // if (nextCoupon)
-      //   document.getElementById("nextCouponDate").value =
-      //     formatDate(nextCoupon);
-      if (remainingCoupons)
-        document.getElementById("couponCount").value = remainingCoupons;
-
-      if (matDate)
-        document.getElementById("maturityDate").value = formatDate(matDate);
-
-      // Устанавливаем текущую дату как дату покупки
-      document.getElementById("purchaseDate").value = getTodayDate();
-
-      // Заполняем цену (преобразуем проценты в абсолютное значение)
-      if (prevPrice) {
-        const priceInRubles = (prevPrice / 100) * (nominal || 1000);
-        document.getElementById("price").value = priceInRubles.toFixed(2);
-        // updatePricePercentage();
-      }
-
-      if (accruedInt >= 0) {
-        document.getElementById("nkd").value = accruedInt;
-      }
+      fillBondForm({
+        bondName,
+        remainingCoupons,
+        nominal,
+        couponValue,
+        nextCoupon,
+        accruedInt,
+        matDate,
+        couponPeriod,
+        prevPrice,
+      });
 
       showStatus("✅ Данные облигации загружены!", "success");
 
@@ -123,7 +107,6 @@ function showStatus(message, type) {
 
 function formatDate(dateString) {
   if (!dateString) return "";
-  // Преобразуем из формата YYYY-MM-DD в тот же формат для input type="date"
   return dateString.split(" ")[0]; // На случай, если приходит с временем
 }
 
@@ -132,18 +115,8 @@ function getTodayDate() {
   return today.toISOString().split("T")[0];
 }
 
-// function updatePricePercentage() {
-//   const price = parseFloat(document.getElementById("price").value) || 0;
-//   const nominal = parseFloat(document.getElementById("nominal").value) || 1000;
-//   const percentage = (price / nominal) * 100;
-//   document.getElementById(
-//     "pricePercentage"
-//   ).textContent = `💰 Цена: ${percentage.toFixed(1)}% от номинала`;
-// }
-
 async function getRemainingCoupons(secid) {
   try {
-    // Запрос к API для получения календаря купонов
     const couponsUrl = `https://iss.moex.com/iss/statistics/engines/stock/markets/bonds/bondization/${secid}.json?limit=100`;
     const response = await fetch(couponsUrl);
     const data = await response.json();
@@ -174,18 +147,74 @@ async function getRemainingCoupons(secid) {
       return couponDate >= today;
     });
 
-    // console.log(
-    //   `📅 Всего купонов: ${coupons.length}, будущих: ${futureCoupons.length}`
-    // );
-
-    // Выводим информацию о ближайших купонах для отладки
-    // futureCoupons.slice(0, 5).forEach((coupon, index) => {
-    //   console.log(`📅 Купон ${index + 1}: ${coupon[couponDateIndex]}`);
-    // });
-
     return futureCoupons.length;
   } catch (error) {
     console.log("❌ Ошибка при получении данных о купонах:", error);
     return null;
+  }
+}
+
+function fillBondForm(bondData) {
+  const {
+    bondName,
+    nominal,
+    couponValue,
+    remainingCoupons,
+    matDate,
+    prevPrice,
+    accruedInt,
+  } = bondData;
+
+  // Заполняем название облигации
+  if (bondName) {
+    document.getElementById("bondName").textContent = bondName;
+  } else {
+    document.getElementById("bondName").textContent = "";
+  }
+
+  // Заполняем номинал
+  if (nominal) {
+    document.getElementById("nominal").value = nominal;
+  } else {
+    document.getElementById("nominal").value = "";
+  }
+
+  // Заполняем купон
+  if (couponValue) {
+    document.getElementById("coupon").value = couponValue;
+  } else {
+    document.getElementById("coupon").value = "";
+  }
+
+  // Заполняем количество оставшихся купонов
+  if (remainingCoupons) {
+    document.getElementById("couponCount").value = remainingCoupons;
+  } else {
+    document.getElementById("couponCount").value = "";
+  }
+
+  // Заполняем дату погашения
+  if (matDate) {
+    document.getElementById("maturityDate").value = formatDate(matDate);
+  } else {
+    document.getElementById("maturityDate").value = "";
+  }
+
+  // Устанавливаем текущую дату как дату покупки
+  document.getElementById("purchaseDate").value = getTodayDate();
+
+  // Заполняем цену (преобразуем проценты в абсолютное значение)
+  if (prevPrice !== undefined && prevPrice !== null) {
+    const priceInRubles = (prevPrice / 100) * (nominal || 1000);
+    document.getElementById("price").value = priceInRubles.toFixed(2);
+  } else {
+    document.getElementById("price").value = "";
+  }
+
+  // Заполняем НКД
+  if (accruedInt >= 0) {
+    document.getElementById("nkd").value = accruedInt;
+  } else {
+    document.getElementById("nkd").value = "";
   }
 }
