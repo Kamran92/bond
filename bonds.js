@@ -1,4 +1,8 @@
-const start = async () => {
+const start = async ({
+  bondType = 9,
+  collateral = 0,
+  secType = ["stock_ofz_bond", "stock_subfederal_bond", "stock_municipal_bond"],
+} = {}) => {
   const params = {
     lang: "ru",
     "iss.meta": false,
@@ -9,14 +13,11 @@ const start = async () => {
     amortization: 0,
     coupon_frequency: [1, 2, 3, 4, 12],
     listname: 1,
-    sec_type: [
-      "stock_ofz_bond",
-      "stock_subfederal_bond",
-      "stock_municipal_bond",
-    ],
+    sec_type: secType,
     currencyid: "rub",
     faceunit: "rub",
-    bond_type: 9, // 9 Фикс с известным купоном, 3 флоатеры
+    bond_type: bondType, // 9 Фикс с известным купоном, 3 флоатеры
+    collateral, // 3 Полное (100%) обеспечение
   };
 
   const queryString = new URLSearchParams(params).toString();
@@ -76,18 +77,7 @@ const start = async () => {
         nkd,
         bondType,
         price,
-        ...calculate1({
-          SECID,
-          nominal,
-          coupons,
-          price: Number(((price / 100) * (nominal || 1000)).toFixed(2)),
-          quantity: 1,
-          nkd,
-          brokerCommission: 0.5,
-          taxRate: 13,
-          purchaseDate: getTodayDate(),
-          maturityDate: matDate,
-        }),
+        maturityDate: matDate,
       });
       // console.log("✅ Данные облигации получены:");
       // console.log("🏷️ Название облигации:", bondName);
@@ -103,23 +93,7 @@ const start = async () => {
     }
   }
 
-  console.table(
-    formattedBonds
-      .toSorted((a, b) => a.days - b.days)
-      .map((item) => ({
-        secId: item.SECID,
-        "% день": Number(item.dailyProfitPercent.toFixed(2)),
-        "% годовых": Number(item.annualProfitPercent.toFixed(2)),
-        "% за период": Number(item.calculationOfNetProfitPercent.toFixed(2)),
-        "осталось дней": item.days,
-        "осталось купонов": item.coupons.length,
-        "Период купона": item.couponPeriod,
-        осталось: convertDaysSimple(item.days),
-        "Вид облигации": item.bondType,
-        "цена %": item.price,
-        Название: item.bondName,
-      })),
-  );
+  return formattedBonds;
 };
 
 async function getCoupons(secid) {
@@ -191,4 +165,131 @@ function getTodayDate() {
   const today = new Date();
   return today.toISOString().split("T")[0];
 }
-start();
+
+const startFixBond = async () => {
+  const bonds = await start();
+
+  console.table(
+    bonds
+      .map((item) => {
+        return {
+          ...item,
+          ...calculate1({
+            SECID: item.SECID,
+            nominal: item.nominal,
+            coupons: item.coupons,
+            price: Number(
+              ((item.price / 100) * (item.nominal || 1000)).toFixed(2),
+            ),
+            quantity: 1,
+            nkd: item.nkd,
+            brokerCommission: 0.5,
+            taxRate: 13,
+            purchaseDate: getTodayDate(),
+            maturityDate: item.maturityDate,
+          }),
+        };
+      })
+      .toSorted((a, b) => a.days - b.days)
+      .map((item) => ({
+        secId: item.SECID,
+        "% день": Number(item.dailyProfitPercent.toFixed(2)),
+        "% годовых": Number(item.annualProfitPercent.toFixed(2)),
+        "% за период": Number(item.calculationOfNetProfitPercent.toFixed(2)),
+        "осталось дней": item.days,
+        "осталось купонов": item.coupons.length,
+        "Период купона": item.couponPeriod,
+        осталось: convertDaysSimple(item.days),
+        "Вид облигации": item.bondType,
+        "цена %": item.price,
+        Название: item.bondName,
+      })),
+  );
+};
+
+const startFloatBond = async () => {
+  const bonds = await start({ bondType: 3 });
+
+  console.table(
+    bonds
+      .map((item) => {
+        return {
+          ...item,
+          ...calculate1({
+            SECID: item.SECID,
+            nominal: item.nominal,
+            coupons: item.coupons,
+            price: Number(
+              ((item.price / 100) * (item.nominal || 1000)).toFixed(2),
+            ),
+            quantity: 1,
+            nkd: item.nkd,
+            brokerCommission: 0.5,
+            taxRate: 13,
+            purchaseDate: getTodayDate(),
+            maturityDate: item.maturityDate,
+          }),
+        };
+      })
+      .toSorted((a, b) => a.days - b.days)
+      .map((item) => ({
+        secId: item.SECID,
+        "% день": Number(item.dailyProfitPercent.toFixed(2)),
+        "% годовых": Number(item.annualProfitPercent.toFixed(2)),
+        "% за период": Number(item.calculationOfNetProfitPercent.toFixed(2)),
+        "осталось дней": item.days,
+        купоны: item.coupons,
+        "Период купона": item.couponPeriod,
+        осталось: convertDaysSimple(item.days),
+        "Вид облигации": item.bondType,
+        "цена %": item.price,
+        Название: item.bondName,
+      })),
+  );
+};
+
+const startWidthMoneyBond = async () => {
+  const bonds = await start({ bondType: 3, collateral: 3, secType: [] });
+
+  console.table(
+    bonds
+      .map((item) => {
+        return {
+          ...item,
+          ...calculate1({
+            SECID: item.SECID,
+            nominal: item.nominal,
+            coupons: item.coupons,
+            price: Number(
+              ((item.price / 100) * (item.nominal || 1000)).toFixed(2),
+            ),
+            quantity: 1,
+            nkd: item.nkd,
+            brokerCommission: 0.5,
+            taxRate: 13,
+            purchaseDate: getTodayDate(),
+            maturityDate: item.maturityDate,
+          }),
+        };
+      })
+      .toSorted((a, b) => a.days - b.days)
+      .map((item) => ({
+        secId: item.SECID,
+        номинал: item.nominal,
+        "% день": Number(item.dailyProfitPercent.toFixed(2)),
+        "% годовых": Number(item.annualProfitPercent.toFixed(2)),
+        "% за период": Number(item.calculationOfNetProfitPercent.toFixed(2)),
+        "осталось дней": item.days,
+        купоны: item.coupons,
+        "Период купона": item.couponPeriod,
+        осталось: convertDaysSimple(item.days),
+        "Вид облигации": item.bondType,
+        "цена %": item.price,
+        Название: item.bondName,
+      })),
+  );
+};
+
+startFixBond();
+// startFloatBond();
+// startWidthMoneyBond();
