@@ -215,30 +215,30 @@ const startFloatBond = async () => {
       .map((item) => {
         return {
           ...item,
-          ...calculate1({
-            SECID: item.SECID,
-            nominal: item.nominal,
-            coupons: item.coupons,
-            price: Number(
-              ((item.price / 100) * (item.nominal || 1000)).toFixed(2),
-            ),
-            quantity: 1,
-            nkd: item.nkd,
-            brokerCommission: 0.5,
-            taxRate: 13,
-            purchaseDate: getTodayDate(),
-            maturityDate: item.maturityDate,
-          }),
+          // ...calculate1({
+          //   SECID: item.SECID,
+          //   nominal: item.nominal,
+          //   coupons: item.coupons,
+          //   price: Number(
+          //     ((item.price / 100) * (item.nominal || 1000)).toFixed(2),
+          //   ),
+          //   quantity: 1,
+          //   nkd: item.nkd,
+          //   brokerCommission: 0.5,
+          //   taxRate: 13,
+          //   purchaseDate: getTodayDate(),
+          //   maturityDate: item.maturityDate,
+          // }),
         };
       })
       .toSorted((a, b) => a.days - b.days)
       .map((item) => ({
         secId: item.SECID,
-        "% день": Number(item.dailyProfitPercent.toFixed(2)),
-        "% годовых": Number(item.annualProfitPercent.toFixed(2)),
-        "% за период": Number(item.calculationOfNetProfitPercent.toFixed(2)),
+        // "% день": Number(item.dailyProfitPercent.toFixed(2)),
+        // "% годовых": Number(item.annualProfitPercent.toFixed(2)),
+        // "% за период": Number(item.calculationOfNetProfitPercent.toFixed(2)),
         "осталось дней": item.days,
-        купоны: item.coupons,
+        купоны: item.coupons.length,
         "Период купона": item.couponPeriod,
         осталось: convertDaysSimple(item.days),
         "Вид облигации": item.bondType,
@@ -291,5 +291,5 @@ const startWidthMoneyBond = async () => {
 };
 
 startFixBond();
-// startFloatBond();
+startFloatBond();
 // startWidthMoneyBond();
